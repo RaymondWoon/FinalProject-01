@@ -1,3 +1,4 @@
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
 public class MapCoordinate
@@ -49,10 +50,12 @@ public class DungeonGenerator : MonoBehaviour
 
         //Debug.Log(_dungeon.Tiles.Length);
 
-        PrintDungeonTiles();
+        //PrintDungeonTiles();
 
-        
-        
+        // Add Entrance
+        _dungeon.AddDungeonEntrance(_dungeonWidth, _dungeonDepth);
+
+        //PrintDungeonRooms();
 
         // Step 1: Generate rooms
         //var rooms = dungeon.GenerateRooms(_noOfRooms, _minRoomSize, _maxRoomSize, _mapSize);
@@ -65,6 +68,8 @@ public class DungeonGenerator : MonoBehaviour
 
         //Debug.Log("Separated Rooms:");
         //dungeon.PrintRooms(rooms);
+
+        //PrintDungeonTiles();
     }
 
     private void PrintDungeonTiles()
@@ -75,6 +80,14 @@ public class DungeonGenerator : MonoBehaviour
             {
                 Debug.Log("X: " + x + ", Z: " + z + ", " + _dungeon.Tiles[x, z].ToString());
             }
+        }
+    }
+
+    private void PrintDungeonRooms()
+    {
+        for (int i = 0; i < _dungeon.Rooms.Count; i++)
+        {
+            Debug.Log(_dungeon.Rooms[i].ToString());
         }
     }
 }
