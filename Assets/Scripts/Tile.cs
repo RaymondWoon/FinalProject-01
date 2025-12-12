@@ -40,7 +40,7 @@ public class Tile
     public Tile()
     {
         tType = TileType.Wall;
-        isVisible = true;
+        isVisible = false;
     }
 
     /// <summary>

@@ -15,9 +15,9 @@ public class Dungeon
 
     private System.Random rng = new();
 
-    public void SetTile(int x, int y, Tile tile)
+    public void SetTile(int x, int z, Tile tile)
     {
-        tiles[x, y] = tile;
+        tiles[x, z] = tile;
     }
 
     //public Dungeon(Tile[,] _tiles, List<Room> _rooms)
@@ -31,10 +31,18 @@ public class Dungeon
     /// </summary>
     public Dungeon() { }
 
+    /// <summary>
+    /// Constructor to initialize the Tile array
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="depth"></param>
     public Dungeon(int width, int depth)
     {
         // Initialize dungeon array
         tiles = new Tile[width, depth];
+
+        // Initialize the dungeon rooms
+        rooms = new List<Room>();
 
         for (var x = 0; x < width; x++)
         {
@@ -51,6 +59,38 @@ public class Dungeon
     {
         tiles = _tiles;
     }
+
+    public void AddDungeonEntrance(int dungeonWidth, int dungeonDepth)
+    {
+        // Entrance is a 3 x 3 room located at the middle bottom
+
+        // Initialize start point
+        int startX = 0;
+        int startZ = 0;
+
+        // Define entrtance along longer axis
+        if (dungeonWidth >= dungeonDepth)
+        {
+            startX = dungeonWidth / 2 - 1;
+        }
+        else
+        {
+            startZ = dungeonDepth / 2 - 1;
+        }
+
+        Room entrance = new Room(startX, startZ, 3, 3, "Entrance");
+
+        rooms.Add(entrance);
+
+        for (int x = startX; x < startX + 3; x++)
+        {
+            for (int z = startZ;  z < startZ + 3; z++)
+            {
+                CarveTile(x, z, Tile.TileType.Room, true);
+            }
+        }
+    }
+
 
     /// <summary>
     /// Random room generator of varying size and position on the map
@@ -79,6 +119,12 @@ public class Dungeon
         }
 
         return rooms;
+    }
+
+    private void CarveTile(int x, int z, Tile.TileType tileType, bool isVisible = true)
+    {
+        tiles[x, z].Type = tileType;
+        tiles[x, z].IsVisible = isVisible;
     }
 
     /// <summary>

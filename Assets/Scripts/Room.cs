@@ -14,11 +14,11 @@ public class Room
     //public int CenterZ => (int)(Z + Length * 0.5);
 
     public int StartX { get; set; }
-    public int StartY { get; set; }
+    public int StartZ { get; set; }
 
     public int Width { get; set; }
 
-    public int Length { get; set; }
+    public int Depth { get; set; }
 
     public string Tag { get; set; }
 
@@ -28,10 +28,10 @@ public class Room
     public Room()
     {
         StartX = 0;
-        StartY = 0;
+        StartZ = 0;
         Width = 0;
-        Length = 0;
-        Tag = null;
+        Depth = 0;
+        Tag = "NA";
     }
 
     /// <summary>
@@ -41,12 +41,12 @@ public class Room
     /// <param name="z"></param>
     /// <param name="width"></param>
     /// <param name="length"></param>
-    public Room(int x, int y, int width, int length, string tag = null)
+    public Room(int x, int z, int width, int depth, string tag = "NA")
     {
         StartX = x;
-        StartY = y;
+        StartZ = z;
         Width = width;
-        Length = length;
+        Depth = depth;
         Tag = tag;
     }
 
@@ -54,7 +54,7 @@ public class Room
     {
         // Check horizontal edges then vertical edges
         return !(StartX + Width < other.StartX || other.StartX + other.Width < StartX
-            || StartY + Length < other.StartY ||  other.StartY + other.Length < StartY);
+            || StartZ + Depth < other.StartZ ||  other.StartZ + other.Depth < StartZ);
     }
 
     /// <summary>
@@ -63,8 +63,8 @@ public class Room
     /// <returns></returns>
     public override string ToString()
     {
-        string template = "X: {0}, Z: {1}, Width: {2}, Length: {3}";
-        string roomData = string.Format(template, StartX, StartY, Width, Length);
+        string template = "X: {0}, Z: {1}, Width: {2}, Depth: {3}, Tag: {4}";
+        string roomData = string.Format(template, StartX, StartZ, Width, Depth, Tag);
 
         return roomData;
     }
