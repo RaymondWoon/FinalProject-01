@@ -54,11 +54,11 @@ public class Tile
         isVisible = _isVisible;
     }
 
-    public void PrintTile(Tile tile)
-    {
-        Console.WriteLine("Type: " + tile.Type + ", isVisible: " + (tile.isVisible ? "1" : "0"));
-    }
-
+    /// <summary>
+    /// Override the default for debugging
+    /// Print the properties of the tile
+    /// </summary>
+    /// <returns></returns>
     public override string ToString()
     {
         return ("Type: " + tType + ", isVisible: " + (isVisible ? "1" : "0"));
