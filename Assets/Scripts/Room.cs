@@ -3,24 +3,22 @@ using UnityEngine;
 
 public class Room
 {
-    // Lower left corner
-    //public int X, Z;
-    // Width & height of room
-    //public int Width, Length;
 
-    // Width of room
-    //public int CenterX => (int)(X + Width * 0.5);
-    // Length of room
-    //public int CenterZ => (int)(Z + Length * 0.5);
-
+    // X coordinate of the lower left corner
     public int StartX { get; set; }
+    // Z coordinate of the lower left corner
     public int StartZ { get; set; }
-
+    // Width of room
     public int Width { get; set; }
-
+    // Depth of room
     public int Depth { get; set; }
-
+    // Tag used to identify the type of room
     public string Tag { get; set; }
+
+    // X coordinate of the centre
+    public int CenterX => (int)(StartX + Width / 2);
+    // Z Coordinate of the centre
+    public int CenterZ => (int)(StartZ + Depth / 2);
 
     /// <summary>
     /// Default constructor
@@ -50,6 +48,11 @@ public class Room
         Tag = tag;
     }
 
+    /// <summary>
+    /// Determines whether 2 rooms intersect or overlap
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public bool Intersects(Room other)
     {
         // Check horizontal edges then vertical edges
@@ -58,6 +61,7 @@ public class Room
     }
 
     /// <summary>
+    /// Override the default for debugging
     /// Print the properties of the room
     /// </summary>
     /// <returns></returns>

@@ -1,37 +1,27 @@
 using System.Collections.Generic;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MapCoordinate
-{
-    public int x, z;
-
-    public MapCoordinate(int _x, int _z)
-    {
-        x = _x;
-        z = _z;
-    }
-}
-
 public class DungeonGenerator : MonoBehaviour
 {
-    [SerializeField] private int _dungeonWidth = 11;
-    [SerializeField] private int _dungeonDepth = 11;
-    [SerializeField] private int _minRoomSize = 4;
-    [SerializeField] private int _maxRoomSize = 6;
-    //[SerializeField] private int _noOfRooms = 2;
+    [SerializeField] private int _dungeonWidth = 15;
+    [SerializeField] private int _dungeonDepth = 15;
+    [SerializeField] private int _minRoomSize = 3;
+    [SerializeField] private int _maxRoomSize = 5;
 
     [Header("** Map **")]
     public Image mapImage;
     public Canvas canvas;
 
     [HideInInspector] public Dungeon _dungeon;
-    [HideInInspector] public Texture2D mapTexture;
-
-
     
+    
+    private Texture2D mapTexture;
+
+    private int numOfTries = 300;
+
+    private System.Random rng = new();
+
 
     private void Awake()
     {
@@ -52,66 +42,133 @@ public class DungeonGenerator : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    //void Update()
+    //{
         
-    }
-
-    
+    //}
 
     private void GenerateDungeon()
     {
         Debug.Log("**GenerateDungeon**");
+        // Initialize the dungeon
         _dungeon = new Dungeon(_dungeonWidth, _dungeonDepth);
 
-        //Debug.Log(_dungeon.Tiles.Length);
+        // Add entrance
+        AddDungeonEntrance();
 
-        //PrintDungeonTiles();
-
-        // Add Entrance
-        _dungeon.AddDungeonEntrance(_dungeonWidth, _dungeonDepth);
-
-        //PrintDungeonRooms();
-
-        // Add additional rooms
-        _dungeon.CreateDungeonRooms(_dungeonWidth, _dungeonDepth, _minRoomSize, _maxRoomSize);
-
-        // Step 1: Generate rooms
-        //var rooms = dungeon.GenerateRooms(_noOfRooms, _minRoomSize, _maxRoomSize, _mapSize);
-
-        //Debug.Log("Initial Rooms:");
-        //dungeon.PrintRooms(rooms);
-
-        // Step 2: Check if rooms overlap, and separate them if they do
-        //dungeon.SeparateRooms(rooms);
-
-        //Debug.Log("Separated Rooms:");
-        //dungeon.PrintRooms(rooms);
-
-        //PrintDungeonTiles();
+        // Add dungeon rooms
+        AddDungeonRooms();
 
         UpdateMap();
     }
 
-    private void PrintDungeonTiles()
+    /// <summary>
+    /// Add the entrance to the dungeons along the middle of the longer
+    /// of the left or the bottom edges
+    /// </summary>
+    private void AddDungeonEntrance()
     {
-        for (int z = 0; z < _dungeonDepth; z++)
+        // Entrance is a 3 x 3 room located at the middle left/bottom of the longest edge
+
+        // Initialize start point
+        int startX = 0;
+        int startZ = 0;
+
+        // Define entrtance along longer axis
+        if (_dungeonWidth >= _dungeonDepth)
         {
-            for (int x = 0; x < _dungeonWidth; x++)
+            startX = _dungeonWidth / 2 - 1;
+        }
+        else
+        {
+            startZ = _dungeonDepth / 2 - 1;
+        }
+
+        // Create the entrance room
+        Room entrance = new Room(startX, startZ, 2, 2, "Entrance");
+
+        // Add the entrance room to the collection
+        _dungeon.Rooms.Add(entrance);
+
+        // Update the dungeon grid
+        for (int x = startX; x < startX + 2; x++)
+        {
+            for (int z = startZ; z < startZ + 2; z++)
             {
-                Debug.Log("X: " + x + ", Z: " + z + ", " + _dungeon.Tiles[x, z].ToString());
+                CarveTile(x, z, Tile.TileType.Room, true);
             }
         }
     }
 
-    private void PrintDungeonRooms()
+    /// <summary>
+    /// Randomly add rectangular rooms of varying sizes
+    /// within the range of _minRoomSize and _maxRoomSize
+    /// </summary>
+    private void AddDungeonRooms()
     {
-        for (int i = 0; i < _dungeon.Rooms.Count; i++)
+        for (var i = 0; i < numOfTries; i++)
         {
-            Debug.Log(_dungeon.Rooms[i].ToString());
+            // Select a random width for the room
+            int width = rng.Next(_minRoomSize, _maxRoomSize + 1);
+            // Select a random depth for the room
+            int depth = rng.Next(_minRoomSize, _maxRoomSize + 1);
+
+            // Select a start point such that the room is within the bounds of the dungeon
+            int startX = rng.Next(1, _dungeonWidth - width - 1);
+            int startZ = rng.Next(1, _dungeonDepth - depth - 1);
+
+            if (startX + width > _dungeonWidth || startZ + depth > _dungeonDepth)
+            {
+                Debug.Log("Error: " + "NX: " + startX + ", NZ: " + startZ + ", width: " + width + ", " + depth);
+                continue;
+            }
+
+            // Create a new room with the random generated parameters
+            Room newRoom = new Room(startX, startZ, width, depth);
+
+            // Check if the newly created room overlaps an existing room
+            bool overlaps = false;
+
+            foreach (var other in _dungeon.Rooms)
+            {
+                if (newRoom.Intersects(other))
+                {
+                    overlaps = true;
+                    break;
+                }
+            }
+
+            // If it does, do not add room and retry
+            if (overlaps) continue;
+
+            // Add new non-overlapping room
+            _dungeon.Rooms.Add(newRoom);
+
+            Debug.Log("New Room added: " + newRoom.ToString());
+
+            // Update the dungeon grid
+            for (int x = startX; x < startX + width; x++)
+            {
+                for (int z = startZ; z < startZ + depth; z++)
+                {
+                    CarveTile(x, z, Tile.TileType.Room, true);
+
+                }
+            }
         }
     }
 
+    #region TILE
+
+    private void CarveTile(int _x, int _z, Tile.TileType _tileType, bool _isVisible = true)
+    {
+        _dungeon.Tiles[_x, _z].Type = _tileType;
+        _dungeon.Tiles[_x, _z].IsVisible = _isVisible;
+    }
+
+    #endregion
+
+    #region MAP
 
     private void CreateMap()
     {
@@ -179,4 +236,6 @@ public class DungeonGenerator : MonoBehaviour
         mapImage.sprite = sprite;
         mapImage.enabled = true;
     }
+
+    #endregion
 }
