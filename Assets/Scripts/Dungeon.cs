@@ -15,6 +15,10 @@ public class Dungeon
 
     private System.Random rng = new();
 
+    private int numOfTries = 500;
+
+    private List<Vector2Int> cardinalDirection;
+
     public void SetTile(int x, int z, Tile tile)
     {
         tiles[x, z] = tile;
@@ -53,6 +57,18 @@ public class Dungeon
                 SetTile(x, y, tile);
             }
         }
+
+        // Initialize cardinalDirections
+        cardinalDirection = new List<Vector2Int>();
+
+        // North
+        cardinalDirection.Add(new Vector2Int(0, 1));
+        // East
+        cardinalDirection.Add(new Vector2Int(1, 0));
+        // South
+        cardinalDirection.Add(new Vector2Int(0, -1));
+        // West
+        cardinalDirection.Add(new Vector2Int(-1, 0));
     }
 
     public Dungeon(Tile[,] _tiles)
@@ -60,7 +76,7 @@ public class Dungeon
         tiles = _tiles;
     }
 
-    public void AddDungeonEntrance(int dungeonWidth, int dungeonDepth)
+    public void AddDungeonEntrance(int _dungeonWidth, int _dungeonDepth)
     {
         // Entrance is a 3 x 3 room located at the middle bottom
 
@@ -69,19 +85,22 @@ public class Dungeon
         int startZ = 0;
 
         // Define entrtance along longer axis
-        if (dungeonWidth >= dungeonDepth)
+        if (_dungeonWidth >= _dungeonDepth)
         {
-            startX = dungeonWidth / 2 - 1;
+            startX = _dungeonWidth / 2 - 1;
         }
         else
         {
-            startZ = dungeonDepth / 2 - 1;
+            startZ = _dungeonDepth / 2 - 1;
         }
 
+        // Create the entrance room
         Room entrance = new Room(startX, startZ, 3, 3, "Entrance");
 
+        // Add the entrance room to the collection
         rooms.Add(entrance);
 
+        // Update the dungeon grid
         for (int x = startX; x < startX + 3; x++)
         {
             for (int z = startZ;  z < startZ + 3; z++)
@@ -91,6 +110,69 @@ public class Dungeon
         }
     }
 
+    public void CreateDungeonRooms(int _dungeonWidth, int _dungeonDepth, int _minRoomSize, int _maxRoomSize)
+    {
+        for (var i = 0; i < numOfTries; i++)
+        {
+            // Select a random width for the room
+            int width = UnityEngine.Random.Range(_minRoomSize, _maxRoomSize + 1);
+            // Select a random depth for the room
+            int depth = UnityEngine.Random.Range(_minRoomSize, _maxRoomSize + 1);
+
+            // First select a random point in lower left quartile, then scale by 2
+            // Ensure that the room is within the dungeon
+            int startX = (int)(UnityEngine.Random.Range(1.0f, (_dungeonWidth - width) * 0.5f)) * 2 + 1;
+            int startZ = (int)(UnityEngine.Random.Range(1.0f, (_dungeonDepth - depth) * 0.5f)) * 2 + 1;
+
+            // Ensure that room fits within constraints of the dungeon
+            // Otherwise an out of index error would occur
+            if (startX + width > _dungeonWidth - 1 || startZ + depth > _dungeonDepth - 1)
+            {
+                //Debug.Log("NX: " + startX + ", NZ: " + startZ + ", width: " + width + ", " + depth);
+                Debug.Log("Error: Room does not fit - dungeon too small or error in room generation");
+                continue;
+            }
+
+            // Create a new room with the random generated parameters
+            Room newRoom = new Room(startX, startZ, width, depth);
+
+            // Check if the newly created room overlaps an existing room
+            bool overlaps = false;
+
+            foreach (var other in Rooms)
+            {
+                if (newRoom.Intersects(other))
+                {
+                    overlaps = true;
+                    break;
+                }
+            }
+
+            // If it does, do not add room and retry
+            if (overlaps) continue;
+
+            // Add new non-overlapping room
+            rooms.Add(newRoom);
+
+            Debug.Log("New Room added: " + newRoom.ToString());
+
+            // Update the dungeon grid
+            for (int x = startX; x < startX + width; x++)
+            {
+                for (int z = startZ; z < startZ + depth; z++)
+                {
+                    CarveTile(x, z, Tile.TileType.Room, true);
+                }
+            }
+        }
+    }
+
+
+    private void CarveTile(int x, int z, Tile.TileType tileType, bool isVisible = true)
+    {
+        tiles[x, z].Type = tileType;
+        tiles[x, z].IsVisible = isVisible;
+    }
 
     /// <summary>
     /// Random room generator of varying size and position on the map
@@ -121,13 +203,9 @@ public class Dungeon
         return rooms;
     }
 
-    private void CarveTile(int x, int z, Tile.TileType tileType, bool isVisible = true)
-    {
-        tiles[x, z].Type = tileType;
-        tiles[x, z].IsVisible = isVisible;
-    }
+    
 
-    /// <summary>
+     /// <summary>
     /// Detect if rooms intersect.
     /// If there is overlap, move by the horizontal and/or vertical distance between centres
     /// </summary>
