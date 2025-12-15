@@ -9,9 +9,17 @@ public class Dungeon
 
     private List<Room> rooms;
 
+    private List<Edge> corridors;
+
     public Tile[,] Tiles { get { return tiles; } }
 
     public List<Room> Rooms { get { return rooms; } }
+
+    public List<Edge> Corridors
+    {
+        get { return corridors; }
+        set { corridors = value; }
+    }
 
     public void SetTile(int x, int z, Tile tile)
     {
@@ -35,6 +43,9 @@ public class Dungeon
 
         // Initialize the dungeon rooms
         rooms = new List<Room>();
+
+        // Initialize the dungeon edges (connectors)
+        corridors = new List<Edge>();
 
         for (var x = 0; x < width; x++)
         {
