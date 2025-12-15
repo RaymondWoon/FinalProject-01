@@ -14,6 +14,7 @@ public class DungeonGenerator : MonoBehaviour
     [Header("** Map **")]
     [SerializeField] private Image _mapImage;
     [SerializeField] private Canvas _canvas;
+    [SerializeField] private bool _showMap = false;
 
     [Header("** Debug **")]
     [SerializeField] private bool _debugOutput = false;
@@ -36,7 +37,8 @@ public class DungeonGenerator : MonoBehaviour
 
     private void Awake()
     {
-        CreateMap();
+        if (_showMap)
+            CreateMap();
     }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -96,7 +98,8 @@ public class DungeonGenerator : MonoBehaviour
         if (_debugOutput)
             DebugOutput();
 
-        UpdateMap();
+        if (_showMap)
+            UpdateMap();
     }
 
     /// <summary>
