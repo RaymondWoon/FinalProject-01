@@ -1,24 +1,27 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DungeonGenerator : MonoBehaviour
 {
-    [SerializeField] private int _dungeonWidth = 15;
-    [SerializeField] private int _dungeonDepth = 15;
+    [SerializeField] private int _dungeonWidth = 29;
+    [SerializeField] private int _dungeonDepth = 29;
     [SerializeField] private int _minRoomSize = 3;
     [SerializeField] private int _maxRoomSize = 5;
 
     [Header("** Map **")]
-    public Image mapImage;
-    public Canvas canvas;
+    [SerializeField] private Image mapImage;
+    [SerializeField] private Canvas canvas;
 
     [HideInInspector] public Dungeon _dungeon;
     
     
     private Texture2D mapTexture;
 
-    private int numOfTries = 300;
+    private int numOfTries = 1000;
+
+    private List<Edge> edges;
 
     private System.Random rng = new();
 
@@ -37,6 +40,9 @@ public class DungeonGenerator : MonoBehaviour
 
         if (_dungeonDepth % 2 == 0)
             _dungeonDepth++;
+
+        // Initialize room connectors
+        edges = new List<Edge>();
 
         GenerateDungeon();
     }
@@ -59,6 +65,9 @@ public class DungeonGenerator : MonoBehaviour
         // Add dungeon rooms
         AddDungeonRooms();
 
+        // Connect the rooms
+        ConnectDungeonRooms();
+
         UpdateMap();
     }
 
@@ -68,7 +77,7 @@ public class DungeonGenerator : MonoBehaviour
     /// </summary>
     private void AddDungeonEntrance()
     {
-        // Entrance is a 3 x 3 room located at the middle left/bottom of the longest edge
+        // Entrance is a 2 x 2 room located at the middle left/bottom of the longest edge
 
         // Initialize start point
         int startX = 0;
@@ -158,8 +167,34 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Add an edge between each room
+    /// </summary>
+    private void ConnectDungeonRooms()
+    {
+        List<Edge> nEdges = new List<Edge>();
+
+        for (int i = 0; i < _dungeon.Rooms.Count; i++)
+        {
+            for (int j = i + 1; j < _dungeon.Rooms.Count; j++)
+            {
+                nEdges.Add(new Edge(_dungeon.Rooms[i], _dungeon.Rooms[j]));
+            }
+        }
+
+        // Sorted in ascending order to be implied 'weight' for MST
+        edges = nEdges.OrderBy(e => e.distance).ToList();
+    }
+
     #region TILE
 
+    /// <summary>
+    /// Update the tiletype from the default 'Wall' to Room, Corridon
+    /// </summary>
+    /// <param name="_x"></param>
+    /// <param name="_z"></param>
+    /// <param name="_tileType"></param>
+    /// <param name="_isVisible"></param>
     private void CarveTile(int _x, int _z, Tile.TileType _tileType, bool _isVisible = true)
     {
         _dungeon.Tiles[_x, _z].Type = _tileType;
