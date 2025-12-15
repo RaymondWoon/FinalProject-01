@@ -290,12 +290,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad62efa13ce3f54d9a7c851c2b84e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
-  _dungeonWidth: 15
-  _dungeonDepth: 15
+  _dungeonWidth: 29
+  _dungeonDepth: 29
   _minRoomSize: 3
   _maxRoomSize: 5
+  mapImage: {fileID: 0}
   canvas: {fileID: 845732478}
-  mapTexture: {fileID: 0}
 --- !u!1 &712951676
 GameObject:
   m_ObjectHideFlags: 0
@@ -425,7 +425,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 40
+  m_ScaleFactor: 30
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0

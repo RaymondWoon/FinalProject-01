@@ -23,6 +23,8 @@ public class DungeonGenerator : MonoBehaviour
 
     private List<Edge> edges;
 
+    private List<Edge> MST;
+
     private System.Random rng = new();
 
 
@@ -43,6 +45,9 @@ public class DungeonGenerator : MonoBehaviour
 
         // Initialize room connectors
         edges = new List<Edge>();
+
+        // Initialize the MST
+        MST = new List<Edge>();
 
         GenerateDungeon();
     }
@@ -67,6 +72,9 @@ public class DungeonGenerator : MonoBehaviour
 
         // Connect the rooms
         ConnectDungeonRooms();
+
+        // Get the MST from the room connectors
+        MST = GetMinimumSpanningTree();
 
         UpdateMap();
     }
@@ -184,6 +192,44 @@ public class DungeonGenerator : MonoBehaviour
 
         // Sorted in ascending order to be implied 'weight' for MST
         edges = nEdges.OrderBy(e => e.distance).ToList();
+    }
+
+    /// <summary>
+    /// Determine the minimum spanning tree using Kruskal's algorithm
+    /// </summary>
+    /// <returns></returns>
+    public List<Edge> GetMinimumSpanningTree()
+    {
+        var mst = new List<Edge>();
+
+        var parent = _dungeon.Rooms.ToDictionary(r => r, r => r);
+
+        // Root node
+        Room Find(Room r)
+        {
+            if (parent[r] != r)
+                parent[r] = Find(parent[r]);
+
+            return parent[r];
+        }
+
+        // Update node
+        void Union(Room a, Room b)
+        {
+            parent[Find(a)] = Find(b);
+        }
+
+        // edges collection is already sorted in increasing order
+        foreach (var edge in edges)
+        {
+            if (Find(edge.A) != Find(edge.B))
+            {
+                mst.Add(edge);
+                Union(edge.A, edge.B);
+            }
+        }
+
+        return mst;
     }
 
     #region TILE
