@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -27,6 +28,8 @@ public class DungeonGenerator : MonoBehaviour
     private List<Edge> edges;
 
     private List<Edge> MST;
+
+    private double chanceXtraCorridor = 0.1;
 
     private System.Random rng = new();
 
@@ -82,6 +85,12 @@ public class DungeonGenerator : MonoBehaviour
 
         // Get the MST from the room connectors
         MST = GetMinimumSpanningTree();
+
+        // Add dungeon corridors
+        _dungeon.Corridors = AddDungeonCorridors();
+
+        // Update the dungeon map for the corridors
+        CarveCorridorTiles();
 
         // Print Debug Output if required
         if (_debugOutput)
@@ -244,6 +253,27 @@ public class DungeonGenerator : MonoBehaviour
         return mst;
     }
 
+    /// <summary>
+    /// Starting with the MST edges, 
+    /// Apply chance to non-MST edges and to form the dungeon corridors
+    /// </summary>
+    /// <returns></returns>
+    public List<Edge> AddDungeonCorridors()
+    {
+        // Initiate new list by copying the MST
+        var _dungeonCorridors = new List<Edge>(MST);
+
+        /// Iterate over all edges
+        foreach (var edge in edges)
+        {
+            // If it's not included in the MST, apply the chance to become a corridor
+            if (!_dungeonCorridors.Contains(edge) && rng.NextDouble() <chanceXtraCorridor)
+                _dungeonCorridors.Add(edge);
+        }
+
+        return _dungeonCorridors;
+    }
+
     #endregion
 
     #region TILE
@@ -259,6 +289,43 @@ public class DungeonGenerator : MonoBehaviour
     {
         _dungeon.Tiles[_x, _z].Type = _tileType;
         _dungeon.Tiles[_x, _z].IsVisible = _isVisible;
+    }
+
+    /// <summary>
+    /// Update the dungeon map for the dungeon corridors
+    /// </summary>
+    private void CarveCorridorTiles()
+    {
+        foreach (var edge in _dungeon.Corridors)
+        {
+            // Room A Centre
+            int cxa = edge.A.CenterX;
+            int cza = edge.A.CenterZ;
+
+            // Room B centre
+            int cxb = edge.B.CenterX;
+            int czb = edge.B.CenterZ;
+
+            // Start from Room A
+            int cx = cxa;
+            int cz = cza;
+
+            while (cz != czb)
+            {
+                if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                    CarveTile(cx, cz, Tile.TileType.Corridor);
+
+                cz += Math.Sign(czb - cz);
+            }
+
+            while (cx != cxb)
+            {
+                if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                    CarveTile(cx, cz, Tile.TileType.Corridor);
+
+                cx += Math.Sign(cxb - cx);
+            }
+        }
     }
 
     #endregion
@@ -338,11 +405,22 @@ public class DungeonGenerator : MonoBehaviour
 
     private void DebugOutput()
     {
-        // Dungeon edges
+        // All room connections
         PrintEdges();
 
-        // Dungeon MST
+        // MST
         PrintMST();
+
+        // Dundeon corridors
+        PrintDungeonCorridors();
+    }
+
+    private void PrintDungeonCorridors()
+    {
+        foreach (var edge in _dungeon.Corridors)
+        {
+            Debug.Log("Corridor: " + edge.ToString());
+        }
     }
 
     private void PrintEdges()
