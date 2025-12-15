@@ -1,15 +1,32 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+//using Unity.VectorGraphics;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class DungeonGenerator : MonoBehaviour
 {
+    [Header("** Dungeon Parameters **")]
     [SerializeField] private int _dungeonWidth = 29;
     [SerializeField] private int _dungeonDepth = 29;
     [SerializeField] private int _minRoomSize = 3;
     [SerializeField] private int _maxRoomSize = 5;
+
+    [Header("** Dungeon Containers **")]
+    [SerializeField] private GameObject _corridorContainer;
+    [SerializeField] private GameObject _doorContainer;
+    [SerializeField] private GameObject _roomContainer;
+    [SerializeField] private GameObject _wallContainer;
+
+    [Header("** Dungeon Prefabs **")]
+    [SerializeField] private GameObject _dungeonWall;
+    [SerializeField] private GameObject _straightPiece;
+    [SerializeField] private GameObject _cornerPiece;
+    [SerializeField] private GameObject _crossRoadPiece;
+    [SerializeField] private GameObject _deadendPiece;
+    [SerializeField] private GameObject _tPiece;
 
     [Header("** Map **")]
     [SerializeField] private Image _mapImage;
@@ -19,7 +36,7 @@ public class DungeonGenerator : MonoBehaviour
     [Header("** Debug **")]
     [SerializeField] private bool _debugOutput = false;
 
-    [HideInInspector] public Dungeon _dungeon;
+    [HideInInspector] public static Dungeon _dungeon;
     
     
     private Texture2D mapTexture;
@@ -31,6 +48,8 @@ public class DungeonGenerator : MonoBehaviour
     private List<Edge> MST;
 
     private double chanceXtraCorridor = 0.1;
+
+    private Scene activeScene;
 
     private System.Random rng = new();
 
@@ -50,6 +69,10 @@ public class DungeonGenerator : MonoBehaviour
 
         if (_dungeonDepth % 2 == 0)
             _dungeonDepth++;
+
+        // Get the active scene
+        activeScene = SceneManager.GetActiveScene();
+        Debug.Log("Active Scene Name: " + activeScene.name);
 
         // Initialize room connectors
         edges = new List<Edge>();
