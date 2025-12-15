@@ -11,15 +11,18 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private int _maxRoomSize = 5;
 
     [Header("** Map **")]
-    [SerializeField] private Image mapImage;
-    [SerializeField] private Canvas canvas;
+    [SerializeField] private Image _mapImage;
+    [SerializeField] private Canvas _canvas;
+
+    [Header("** Debug **")]
+    [SerializeField] private bool _debugOutput = false;
 
     [HideInInspector] public Dungeon _dungeon;
     
     
     private Texture2D mapTexture;
 
-    private int numOfTries = 1000;
+    private int numOfTries = 800;
 
     private List<Edge> edges;
 
@@ -55,12 +58,16 @@ public class DungeonGenerator : MonoBehaviour
     // Update is called once per frame
     //void Update()
     //{
-        
+
     //}
+
+    #region DUNGEON
 
     private void GenerateDungeon()
     {
-        Debug.Log("**GenerateDungeon**");
+        if (_debugOutput)
+            Debug.Log("**GenerateDungeon**");
+
         // Initialize the dungeon
         _dungeon = new Dungeon(_dungeonWidth, _dungeonDepth);
 
@@ -75,6 +82,10 @@ public class DungeonGenerator : MonoBehaviour
 
         // Get the MST from the room connectors
         MST = GetMinimumSpanningTree();
+
+        // Print Debug Output if required
+        if (_debugOutput)
+            DebugOutput();
 
         UpdateMap();
     }
@@ -161,7 +172,8 @@ public class DungeonGenerator : MonoBehaviour
             // Add new non-overlapping room
             _dungeon.Rooms.Add(newRoom);
 
-            Debug.Log("New Room added: " + newRoom.ToString());
+            if (_debugOutput)
+                Debug.Log("New Room added: " + newRoom.ToString());
 
             // Update the dungeon grid
             for (int x = startX; x < startX + width; x++)
@@ -232,6 +244,8 @@ public class DungeonGenerator : MonoBehaviour
         return mst;
     }
 
+    #endregion
+
     #region TILE
 
     /// <summary>
@@ -259,9 +273,9 @@ public class DungeonGenerator : MonoBehaviour
         // add a rect Transform to replace the normal Transform
         RectTransform sRect = mapGO.AddComponent<RectTransform>();
 
-        sRect.SetParent(canvas.gameObject.transform, false);
+        sRect.SetParent(_canvas.gameObject.transform, false);
         // Add a sprite Renderer to the new Object
-        mapImage = mapGO.AddComponent<Image>();
+        _mapImage = mapGO.AddComponent<Image>();
 
         mapTexture = new Texture2D(1, 1, TextureFormat.RGBA32, false);
         mapTexture.filterMode = FilterMode.Point;
@@ -306,16 +320,45 @@ public class DungeonGenerator : MonoBehaviour
     private void RefreshMap(Vector2 sizePx)
     {
         //keep order of this changes:		
-        mapImage.rectTransform.anchorMin = new Vector2(1F, 0F);
-        mapImage.rectTransform.anchorMax = new Vector2(1F, 0F);
-        mapImage.rectTransform.pivot = new Vector2(1F, 0F);
-        mapImage.rectTransform.offsetMin = Vector2.zero;
-        mapImage.rectTransform.offsetMax = sizePx * 1F;   //1 tile = 2x2 px
-        mapImage.rectTransform.anchoredPosition = new Vector2(-3, +3);//small dist from corner	
+        _mapImage.rectTransform.anchorMin = new Vector2(1F, 0F);
+        _mapImage.rectTransform.anchorMax = new Vector2(1F, 0F);
+        _mapImage.rectTransform.pivot = new Vector2(1F, 0F);
+        _mapImage.rectTransform.offsetMin = Vector2.zero;
+        _mapImage.rectTransform.offsetMax = sizePx * 1F;   //1 tile = 2x2 px
+        _mapImage.rectTransform.anchoredPosition = new Vector2(-3, +3);//small dist from corner	
 
         Sprite sprite = Sprite.Create(mapTexture, new Rect(0, 0, mapTexture.width, mapTexture.height), new Vector2(0.5F, 0.5F));
-        mapImage.sprite = sprite;
-        mapImage.enabled = true;
+        _mapImage.sprite = sprite;
+        _mapImage.enabled = true;
+    }
+
+    #endregion
+
+    #region DEBUG
+
+    private void DebugOutput()
+    {
+        // Dungeon edges
+        PrintEdges();
+
+        // Dungeon MST
+        PrintMST();
+    }
+
+    private void PrintEdges()
+    {
+        foreach (var edge in edges)
+        {
+            Debug.Log("Edge: " + edge.ToString());
+        }
+    }
+
+    private void PrintMST()
+    {
+        foreach (var edge in MST)
+        {
+            Debug.Log("MST: " + edge.ToString());
+        }
     }
 
     #endregion
