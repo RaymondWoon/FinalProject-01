@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class DungeonGenerator : MonoBehaviour
 {
+    [SerializeField] private GameObject _player;
+
     [Header("** Dungeon Parameters **")]
     [SerializeField] private int _dungeonWidth = 29;
     [SerializeField] private int _dungeonDepth = 29;
@@ -27,6 +29,12 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private GameObject _crossRoadPiece;
     [SerializeField] private GameObject _deadendPiece;
     [SerializeField] private GameObject _tPiece;
+
+    [Header("** Prototype Prefabs **")]
+    [SerializeField] private GameObject _prototypeCorridor;
+    [SerializeField] private GameObject _prototypeRoom;
+    [SerializeField] private GameObject _prototypeWall;
+    [SerializeField] private bool _isPrototype = false;
 
     [Header("** Map **")]
     [SerializeField] private Image _mapImage;
@@ -74,6 +82,8 @@ public class DungeonGenerator : MonoBehaviour
         activeScene = SceneManager.GetActiveScene();
         Debug.Log("Active Scene Name: " + activeScene.name);
 
+        _player.transform.position = new Vector3(_dungeonWidth / 2, 0, 1);
+
         // Initialize room connectors
         edges = new List<Edge>();
 
@@ -116,6 +126,12 @@ public class DungeonGenerator : MonoBehaviour
 
         // Update the dungeon map for the corridors
         CarveCorridorTiles();
+
+        // Generate Prototype if required
+        if (_isPrototype)
+        {
+            DrawPrototype();
+        }
 
         // Print Debug Output if required
         if (_debugOutput)
@@ -350,6 +366,37 @@ public class DungeonGenerator : MonoBehaviour
                     CarveTile(cx, cz, Tile.TileType.Corridor);
 
                 cx += Math.Sign(cxb - cx);
+            }
+        }
+    }
+
+    #endregion
+
+    #region PROTOTYPE
+
+    private void DrawPrototype()
+    {
+        for (int z = 0; z < _dungeonDepth; z++)
+        {
+            for (int x = 0; x < _dungeonWidth; x++)
+            {
+                Vector3 pos = new Vector3(x, 0, z);
+
+                if (_dungeon.Tiles[x, z].Type == Tile.TileType.Wall)
+                {
+                    GameObject wall = Instantiate(_prototypeWall, pos, Quaternion.identity);
+                    wall.transform.parent = _wallContainer.transform;
+                }
+                else if (_dungeon.Tiles[x, z].Type == Tile.TileType.Room)
+                {
+                    GameObject room = Instantiate(_prototypeRoom, pos, Quaternion.identity);
+                    room.transform.parent = _roomContainer.transform;
+                }
+                else if (_dungeon.Tiles[x, z].Type == Tile.TileType.Corridor)
+                {
+                    GameObject corridor = Instantiate(_prototypeCorridor, pos, Quaternion.identity);
+                    corridor.transform.parent = _corridorContainer.transform;
+                }
             }
         }
     }
