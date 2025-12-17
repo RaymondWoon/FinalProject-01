@@ -493,6 +493,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2348665072262702496, guid: 5c3c9241118d8064083eed2797a3f070, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2348665072262702496, guid: 5c3c9241118d8064083eed2797a3f070, type: 3}
       propertyPath: mouseSensitivity
       value: 0.5
       objectReference: {fileID: 0}
@@ -643,8 +647,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   _player: {fileID: 1793584534}
-  _dungeonWidth: 19
-  _dungeonDepth: 19
+  _dungeonWidth: 29
+  _dungeonDepth: 49
   _minRoomSize: 3
   _maxRoomSize: 5
   _corridorContainer: {fileID: 2017560866}
