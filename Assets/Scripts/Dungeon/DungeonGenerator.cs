@@ -21,6 +21,8 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private GameObject _doorContainer;
     [SerializeField] private GameObject _roomContainer;
     [SerializeField] private GameObject _wallContainer;
+    [SerializeField] private GameObject _enemyContainer;
+    [SerializeField] private GameObject _treasureContainer;
 
     [Header("** Dungeon Prefabs **")]
     [SerializeField] private GameObject _dungeonWall;
@@ -36,6 +38,10 @@ public class DungeonGenerator : MonoBehaviour
     [SerializeField] private GameObject _prototypeWall;
     [SerializeField] private bool _isPrototype = false;
 
+    [Header("** Game Elements **")]
+    [SerializeField] private GameObject _enemy;
+    [SerializeField] private GameObject _treasure;
+    
     [Header("** Map **")]
     [SerializeField] private Image _mapImage;
     [SerializeField] private Canvas _canvas;
@@ -58,6 +64,8 @@ public class DungeonGenerator : MonoBehaviour
     private double chanceXtraCorridor = 0.1;
 
     private Scene activeScene;
+
+    private int _scale = 6;
 
     private System.Random rng = new();
 
@@ -86,11 +94,11 @@ public class DungeonGenerator : MonoBehaviour
         {
             if (_dungeonWidth >= _dungeonDepth)
             {
-                _player.transform.position = new Vector3(_dungeonWidth / 2, 0, 1);
+                _player.transform.position = new Vector3(_dungeonWidth / 2, 1.5f, 1);
             }
             else
             {
-                _player.transform.position = new Vector3(1, 0, _dungeonDepth / 2);
+                _player.transform.position = new Vector3(1, 1.5f, _dungeonDepth / 2);
             }
         }
 
@@ -142,6 +150,9 @@ public class DungeonGenerator : MonoBehaviour
         {
             DrawPrototype();
         }
+
+        // Spawn the enemies
+        SpawnEnemy();
 
         // Print Debug Output if required
         if (_debugOutput)
@@ -316,12 +327,12 @@ public class DungeonGenerator : MonoBehaviour
         var _dungeonCorridors = new List<Edge>(MST);
 
         /// Iterate over all edges
-        foreach (var edge in edges)
-        {
-            // If it's not included in the MST, apply the chance to become a corridor
-            if (!_dungeonCorridors.Contains(edge) && rng.NextDouble() <chanceXtraCorridor)
-                _dungeonCorridors.Add(edge);
-        }
+        //foreach (var edge in edges)
+        //{
+        //    // If it's not included in the MST, apply the chance to become a corridor
+        //    if (!_dungeonCorridors.Contains(edge) && rng.NextDouble() <chanceXtraCorridor)
+        //        _dungeonCorridors.Add(edge);
+        //}
 
         return _dungeonCorridors;
     }
@@ -382,6 +393,23 @@ public class DungeonGenerator : MonoBehaviour
 
     #endregion
 
+    #region GAME OBJECTS
+
+    private void SpawnEnemy()
+    {
+        foreach (Room room in _dungeon.Rooms)
+        {
+            if (room.Tag == "Entrance") continue;
+
+            Vector3 pos = new Vector3(room.CenterX * _scale, 1.5f, room.CenterZ * _scale);
+
+            GameObject enemy = Instantiate(_enemy, pos, Quaternion.identity);
+            enemy.transform.parent = _enemyContainer.transform;
+        }
+    }
+
+    #endregion
+
     #region PROTOTYPE
 
     private void DrawPrototype()
@@ -390,21 +418,24 @@ public class DungeonGenerator : MonoBehaviour
         {
             for (int x = 0; x < _dungeonWidth; x++)
             {
-                Vector3 pos = new Vector3(x, 0, z);
+                Vector3 pos = new Vector3(x * _scale, 0, z * _scale);
 
                 if (_dungeon.Tiles[x, z].Type == Tile.TileType.Wall)
                 {
                     GameObject wall = Instantiate(_prototypeWall, pos, Quaternion.identity);
+                    wall.transform.localScale = new Vector3(_scale, 1, _scale);
                     wall.transform.parent = _wallContainer.transform;
                 }
                 else if (_dungeon.Tiles[x, z].Type == Tile.TileType.Room)
                 {
                     GameObject room = Instantiate(_prototypeRoom, pos, Quaternion.identity);
+                    room.transform.localScale = new Vector3(_scale, 1, _scale);
                     room.transform.parent = _roomContainer.transform;
                 }
                 else if (_dungeon.Tiles[x, z].Type == Tile.TileType.Corridor)
                 {
                     GameObject corridor = Instantiate(_prototypeCorridor, pos, Quaternion.identity);
+                    corridor.transform.localScale = new Vector3(_scale, 1, _scale);
                     corridor.transform.parent = _corridorContainer.transform;
                 }
             }

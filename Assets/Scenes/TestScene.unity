@@ -290,10 +290,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3ad62efa13ce3f54d9a7c851c2b84e22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
+  _player: {fileID: 0}
   _dungeonWidth: 19
   _dungeonDepth: 19
   _minRoomSize: 3
   _maxRoomSize: 5
+  _corridorContainer: {fileID: 0}
+  _doorContainer: {fileID: 0}
+  _roomContainer: {fileID: 0}
+  _wallContainer: {fileID: 0}
+  _dungeonWall: {fileID: 0}
+  _straightPiece: {fileID: 0}
+  _cornerPiece: {fileID: 0}
+  _crossRoadPiece: {fileID: 0}
+  _deadendPiece: {fileID: 0}
+  _tPiece: {fileID: 0}
+  _prototypeCorridor: {fileID: 0}
+  _prototypeRoom: {fileID: 0}
+  _prototypeWall: {fileID: 0}
+  _isPrototype: 0
   _mapImage: {fileID: 0}
   _canvas: {fileID: 845732478}
   _showMap: 1
@@ -427,7 +442,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
   m_UiScaleMode: 0
   m_ReferencePixelsPerUnit: 100
-  m_ScaleFactor: 30
+  m_ScaleFactor: 20
   m_ReferenceResolution: {x: 800, y: 600}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
