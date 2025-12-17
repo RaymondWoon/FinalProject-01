@@ -151,8 +151,16 @@ public class DungeonGenerator : MonoBehaviour
             DrawPrototype();
         }
 
-        // Spawn the enemies
-        SpawnEnemy();
+        if (activeScene.name != "TestScene")
+        {
+            // Spawn the enemies
+            SpawnEnemy();
+
+            // Spawn treasure
+            SpawnTreasure();
+        }
+
+            
 
         // Print Debug Output if required
         if (_debugOutput)
@@ -405,6 +413,28 @@ public class DungeonGenerator : MonoBehaviour
 
             GameObject enemy = Instantiate(_enemy, pos, Quaternion.identity);
             enemy.transform.parent = _enemyContainer.transform;
+        }
+    }
+
+    private void SpawnTreasure()
+    {
+        foreach (Room room in _dungeon.Rooms)
+        {
+            if (room.Tag == "Entrance") continue;
+
+            //Vector3 pos = new Vector3(room.CenterX * _scale, 1.5f, room.CenterZ * _scale);
+
+            Vector3 pos1 = new Vector3((room.StartX + 1) * _scale, 1.0f, (room.StartZ + 1) * _scale);
+            Vector3 pos2 = new Vector3((room.StartX + room.Width - 1) * _scale, 1.0f, (room.StartZ + 1) * _scale);
+            Vector3 pos3 = new Vector3((room.StartX + room.Width - 1) * _scale, 1.0f, (room.StartZ + room.Depth - 1) * _scale);
+            Vector3 pos4 = new Vector3((room.StartX + 1) * _scale, 1.0f, (room.StartZ + room.Depth - 1) * _scale);
+
+            Vector3[] pos = { pos1, pos2, pos3, pos4 };
+
+            GameObject treasure = Instantiate(_treasure, pos[rng.Next(0, pos.Length)], Quaternion.identity);
+            treasure.transform.localRotation = Quaternion.Euler(0, 0, 90f);
+            //treasure.transform.localScale = new Vector3(_scale, 1, _scale);
+            treasure.transform.parent = _treasureContainer.transform;
         }
     }
 
