@@ -422,6 +422,37 @@ Transform:
   - {fileID: 1319342803}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &959694828
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 959694829}
+  m_Layer: 0
+  m_Name: Treasure
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &959694829
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 959694828}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1319342803}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &981348024
 GameObject:
   m_ObjectHideFlags: 0
@@ -596,6 +627,7 @@ Transform:
   - {fileID: 547603045}
   - {fileID: 1692136600}
   - {fileID: 1188304905}
+  - {fileID: 959694829}
   m_Father: {fileID: 940549002}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1319342804
@@ -620,7 +652,7 @@ MonoBehaviour:
   _roomContainer: {fileID: 547603044}
   _wallContainer: {fileID: 1692136599}
   _enemyContainer: {fileID: 1188304904}
-  _treasureContainer: {fileID: 0}
+  _treasureContainer: {fileID: 959694828}
   _dungeonWall: {fileID: 4149020318542485058, guid: 40aa19b34c1006d47a994c8922521ece, type: 3}
   _straightPiece: {fileID: 7867473901448864979, guid: 71e45e8e8f857284e9ea33e3f0fd036b, type: 3}
   _cornerPiece: {fileID: 5486099205659345167, guid: 5a52dcd0c97c16146a8932aeb52071e3, type: 3}
@@ -632,7 +664,7 @@ MonoBehaviour:
   _prototypeWall: {fileID: 5273851498656874409, guid: 6e3e8a8118fd8a048b45b9303c5b93be, type: 3}
   _isPrototype: 1
   _enemy: {fileID: 1446679398601916259, guid: 44e48528f45c16843a4f734c26b9484f, type: 3}
-  _treasure: {fileID: 0}
+  _treasure: {fileID: 5660654624780995998, guid: 53746f5d208efa44eb2a29b08d252433, type: 3}
   _mapImage: {fileID: 0}
   _canvas: {fileID: 0}
   _showMap: 0
