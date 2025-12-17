@@ -90,17 +90,17 @@ public class DungeonGenerator : MonoBehaviour
         activeScene = SceneManager.GetActiveScene();
         Debug.Log("Active Scene Name: " + activeScene.name);
 
-        if (activeScene.name != "TestScene")
-        {
-            if (_dungeonWidth >= _dungeonDepth)
-            {
-                _player.transform.position = new Vector3(_dungeonWidth / 2, 1.5f, 1);
-            }
-            else
-            {
-                _player.transform.position = new Vector3(1, 1.5f, _dungeonDepth / 2);
-            }
-        }
+        //if (activeScene.name != "TestScene")
+        //{
+        //    if (_dungeonWidth >= _dungeonDepth)
+        //    {
+        //        _player.transform.position = new Vector3(_dungeonWidth / 2, 1.5f, 1);
+        //    }
+        //    else
+        //    {
+        //        _player.transform.position = new Vector3(1, 1.5f, _dungeonDepth / 2);
+        //    }
+        //}
 
         // Initialize room connectors
         edges = new List<Edge>();
@@ -127,10 +127,10 @@ public class DungeonGenerator : MonoBehaviour
         // Initialize the dungeon
         _dungeon = new Dungeon(_dungeonWidth, _dungeonDepth);
 
-        // Add entrance
+        // Step 1: Add entrance
         AddDungeonEntrance();
 
-        // Add dungeon rooms
+        // Step 2: Add dungeon rooms
         AddDungeonRooms();
 
         // Connect the rooms
@@ -160,11 +160,15 @@ public class DungeonGenerator : MonoBehaviour
             SpawnTreasure();
         }
 
-            
+        // Update the player start position to the entrance room
+        if (activeScene.name != "TestScene")
+        {
+            UpdatePlayerInitialPosition();
+        }
 
         // Print Debug Output if required
         if (_debugOutput)
-            DebugOutput();
+        DebugOutput();
 
         if (_showMap)
             UpdateMap();
@@ -343,6 +347,13 @@ public class DungeonGenerator : MonoBehaviour
         //}
 
         return _dungeonCorridors;
+    }
+
+    private void UpdatePlayerInitialPosition()
+    {
+        Vector3 pos = new Vector3(_dungeon.Rooms[0].CenterX * _scale, 1f, _dungeon.Rooms[0].CenterZ * _scale);
+
+        _player.transform.position = pos;
     }
 
     #endregion

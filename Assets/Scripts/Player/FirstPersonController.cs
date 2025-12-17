@@ -12,6 +12,7 @@ public class FirstPersonController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private CharacterController characterController;
+    //[SerializeField] private GameObject _player;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private PlayerInputHandler playerInputHandler;
 
@@ -55,7 +56,8 @@ public class FirstPersonController : MonoBehaviour
         currentMovement.x = worldDirection.x * CurrentSpeed;
         currentMovement.z = worldDirection.z * CurrentSpeed;
 
-        characterController.Move(currentMovement * Time.deltaTime);
+        transform.position += new Vector3(currentMovement.x * Time.deltaTime, 0f, currentMovement.z * Time.deltaTime);
+        
     }
 
     private void ApplyHorizontalRotation(float rotationAmount)
