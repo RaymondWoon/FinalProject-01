@@ -61,7 +61,7 @@ public class DungeonGenerator : MonoBehaviour
 
     private List<Edge> MST;
 
-    private double chanceXtraCorridor = 0.1;
+    //private double chanceXtraCorridor = 0.1;
 
     private Scene activeScene;
 
@@ -90,18 +90,6 @@ public class DungeonGenerator : MonoBehaviour
         activeScene = SceneManager.GetActiveScene();
         Debug.Log("Active Scene Name: " + activeScene.name);
 
-        //if (activeScene.name != "TestScene")
-        //{
-        //    if (_dungeonWidth >= _dungeonDepth)
-        //    {
-        //        _player.transform.position = new Vector3(_dungeonWidth / 2, 1.5f, 1);
-        //    }
-        //    else
-        //    {
-        //        _player.transform.position = new Vector3(1, 1.5f, _dungeonDepth / 2);
-        //    }
-        //}
-
         // Initialize room connectors
         edges = new List<Edge>();
 
@@ -119,6 +107,9 @@ public class DungeonGenerator : MonoBehaviour
 
     #region DUNGEON
 
+    /// <summary>
+    /// Main method to access the methods to generate the dungeon
+    /// </summary>
     private void GenerateDungeon()
     {
         if (_debugOutput)
@@ -349,6 +340,9 @@ public class DungeonGenerator : MonoBehaviour
         return _dungeonCorridors;
     }
 
+    /// <summary>
+    /// Update the player’s initial position to the entrance
+    /// </summary>
     private void UpdatePlayerInitialPosition()
     {
         Vector3 pos = new Vector3(_dungeon.Rooms[0].CenterX * _scale, 1f, _dungeon.Rooms[0].CenterZ * _scale);
@@ -392,21 +386,46 @@ public class DungeonGenerator : MonoBehaviour
             int cx = cxa;
             int cz = cza;
 
-            while (cz != czb)
+            if (_dungeonWidth >= _dungeonDepth)
             {
-                if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
-                    CarveTile(cx, cz, Tile.TileType.Corridor);
+                // Vertical first
+                while (cz != czb)
+                {
+                    if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                        CarveTile(cx, cz, Tile.TileType.Corridor);
 
-                cz += Math.Sign(czb - cz);
+                    cz += Math.Sign(czb - cz);
+                }
+
+                while (cx != cxb)
+                {
+                    if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                        CarveTile(cx, cz, Tile.TileType.Corridor);
+
+                    cx += Math.Sign(cxb - cx);
+                }
+            }
+            else
+            {
+                // Horizontal first
+                while (cx != cxb)
+                {
+                    if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                        CarveTile(cx, cz, Tile.TileType.Corridor);
+
+                    cx += Math.Sign(cxb - cx);
+                }
+
+                while (cz != czb)
+                {
+                    if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
+                        CarveTile(cx, cz, Tile.TileType.Corridor);
+
+                    cz += Math.Sign(czb - cz);
+                }
             }
 
-            while (cx != cxb)
-            {
-                if (_dungeon.Tiles[cx, cz].Type == Tile.TileType.Wall)
-                    CarveTile(cx, cz, Tile.TileType.Corridor);
-
-                cx += Math.Sign(cxb - cx);
-            }
+            
         }
     }
 
@@ -414,6 +433,9 @@ public class DungeonGenerator : MonoBehaviour
 
     #region GAME OBJECTS
 
+    /// <summary>
+    /// Spawn enemy in each room
+    /// </summary>
     private void SpawnEnemy()
     {
         foreach (Room room in _dungeon.Rooms)
@@ -427,6 +449,9 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Spawn treasure in each room
+    /// </summary>
     private void SpawnTreasure()
     {
         foreach (Room room in _dungeon.Rooms)
@@ -453,6 +478,9 @@ public class DungeonGenerator : MonoBehaviour
 
     #region PROTOTYPE
 
+    /// <summary>
+    /// Generate the prototype dungeon
+    /// </summary>
     private void DrawPrototype()
     {
         for (int z = 0; z < _dungeonDepth; z++)
@@ -487,6 +515,9 @@ public class DungeonGenerator : MonoBehaviour
 
     #region MAP
 
+    /// <summary>
+    /// Create the Map GameObject
+    /// </summary>
     private void CreateMap()
     {
         GameObject mapGO = new GameObject();
@@ -503,16 +534,16 @@ public class DungeonGenerator : MonoBehaviour
         mapTexture.filterMode = FilterMode.Point;
     }
 
+    /// <summary>
+    /// Update the map based on the TileType
+    /// </summary>
     public void UpdateMap()
     {
-        int xDim = _dungeon.Tiles.GetLength(0);
-        int yDim = _dungeon.Tiles.GetLength(1);
+        mapTexture.Reinitialize(_dungeonWidth, _dungeonDepth, TextureFormat.RGBA32, false);
 
-        mapTexture.Reinitialize(xDim, yDim, TextureFormat.RGBA32, false);
-
-        for (int x = 0; x < xDim; x++)
+        for (int x = 0; x < _dungeonWidth; x++)
         {
-            for (int y = 0; y < yDim; y++)
+            for (int y = 0; y < _dungeonDepth; y++)
             {
                 switch (_dungeon.Tiles[x, y].Type)
                 {
@@ -536,9 +567,13 @@ public class DungeonGenerator : MonoBehaviour
         }
 
         mapTexture.Apply();
-        RefreshMap(new Vector2(xDim, yDim));
+        RefreshMap(new Vector2(_dungeonWidth, _dungeonDepth));
     }
 
+    /// <summary>
+    /// Refresh the dungeon map
+    /// </summary>
+    /// <param name="sizePx"></param>
     private void RefreshMap(Vector2 sizePx)
     {
         //keep order of this changes:		
@@ -558,6 +593,9 @@ public class DungeonGenerator : MonoBehaviour
 
     #region DEBUG
 
+    /// <summary>
+    /// Main method to print Debug notes
+    /// </summary>
     private void DebugOutput()
     {
         // All room connections
@@ -570,6 +608,9 @@ public class DungeonGenerator : MonoBehaviour
         PrintDungeonCorridors();
     }
 
+    /// <summary>
+    /// Print the accepted corridors in the dungeon
+    /// </summary>
     private void PrintDungeonCorridors()
     {
         foreach (var edge in _dungeon.Corridors)
@@ -578,6 +619,9 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Print all room connections – Delaunay Triangulation
+    /// </summary>
     private void PrintEdges()
     {
         foreach (var edge in edges)
@@ -586,6 +630,9 @@ public class DungeonGenerator : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Print the Edges resulting from Kruskal’s algorithm
+    /// </summary>
     private void PrintMST()
     {
         foreach (var edge in MST)

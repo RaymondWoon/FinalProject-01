@@ -299,6 +299,8 @@ MonoBehaviour:
   _doorContainer: {fileID: 0}
   _roomContainer: {fileID: 0}
   _wallContainer: {fileID: 0}
+  _enemyContainer: {fileID: 0}
+  _treasureContainer: {fileID: 0}
   _dungeonWall: {fileID: 0}
   _straightPiece: {fileID: 0}
   _cornerPiece: {fileID: 0}
@@ -309,6 +311,8 @@ MonoBehaviour:
   _prototypeRoom: {fileID: 0}
   _prototypeWall: {fileID: 0}
   _isPrototype: 0
+  _enemy: {fileID: 0}
+  _treasure: {fileID: 0}
   _mapImage: {fileID: 0}
   _canvas: {fileID: 845732478}
   _showMap: 1
