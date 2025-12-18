@@ -316,7 +316,7 @@ MonoBehaviour:
   _mapImage: {fileID: 0}
   _canvas: {fileID: 845732478}
   _showMap: 1
-  _debugOutput: 0
+  _debugOutput: 1
 --- !u!1 &712951676
 GameObject:
   m_ObjectHideFlags: 0

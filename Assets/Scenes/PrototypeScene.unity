@@ -647,8 +647,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DungeonGenerator
   _player: {fileID: 1793584534}
-  _dungeonWidth: 29
-  _dungeonDepth: 49
+  _dungeonWidth: 19
+  _dungeonDepth: 19
   _minRoomSize: 3
   _maxRoomSize: 5
   _corridorContainer: {fileID: 2017560866}
