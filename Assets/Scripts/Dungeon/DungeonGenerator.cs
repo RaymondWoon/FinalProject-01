@@ -88,7 +88,7 @@ public class DungeonGenerator : MonoBehaviour
 
         // Get the active scene
         activeScene = SceneManager.GetActiveScene();
-        Debug.Log("Active Scene Name: " + activeScene.name);
+        //Debug.Log("Active Scene Name: " + activeScene.name);
 
         // Initialize room connectors
         edges = new List<Edge>();
@@ -159,7 +159,7 @@ public class DungeonGenerator : MonoBehaviour
 
         // Print Debug Output if required
         if (_debugOutput)
-        DebugOutput();
+            DebugOutput();
 
         if (_showMap)
             UpdateMap();
@@ -201,6 +201,10 @@ public class DungeonGenerator : MonoBehaviour
                 CarveTile(x, z, Tile.TileType.Room, true);
             }
         }
+
+        // Debug output
+        if (_debugOutput)
+            Debug.Log("New Room added: " + entrance.ToString());
     }
 
     /// <summary>
@@ -598,6 +602,9 @@ public class DungeonGenerator : MonoBehaviour
     /// </summary>
     private void DebugOutput()
     {
+        // Print Dungeon tiles
+        PrintDungeonTiles();
+
         // All room connections
         PrintEdges();
 
@@ -606,6 +613,20 @@ public class DungeonGenerator : MonoBehaviour
 
         // Dundeon corridors
         PrintDungeonCorridors();
+    }
+
+    /// <summary>
+    /// Print the accepted corridors in the dungeon
+    /// </summary>
+    private void PrintDungeonTiles()
+    {
+        for (int i = 0; i < _dungeonWidth; i++)
+        {
+            for (int j = 0; j < _dungeonDepth; j++)
+            {
+                Debug.Log("X: " + i.ToString() + ", Y: " + j.ToString() + ", " + _dungeon.Tiles[i, j].ToString());
+            }
+        }
     }
 
     /// <summary>
